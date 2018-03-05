@@ -10,27 +10,55 @@ else:
 import sqlite3
 from tkinter import *
 
-XX = 'None!'
-YY = 'None!'
-ZZ = 'None!'
-database_path = "outputnew.db" 
-root = tk.Tk()
-
-class windowclass(tk.Frame):
+class windowclass(tk.Frame): #建立視窗實體
     def __init__(self, master):         
-        tk.Frame.__init__(self, master)
-        master.title("綠建築查詢系統")
+        tk.Frame.__init__(self, master = None)
+        self.master = master
+        self.init_window()
+
+    def set_db1(self):
+        self.get_data('leed.db')
+    def set_db2(self):
+        self.get_data()
+		
+    #初始視窗的創建
+    def init_window(self):
+        self.master.title("綠建築查詢系統")           		
         self.master.geometry("750x600")
-        
-        con=sqlite3.connect('outputnew.db')
+		
+		#建立一個選單實體
+        menubar = Menu(self.master)
+        self.master.config(menu = menubar)
+		
+		#建立檔案物件
+        filemenu = Menu(menubar, tearoff=0)
+        #添加一個命令到選單選項，呼叫它來離開，而命令，它在client_exit事件執行
+        filemenu.add_command(label = 'LEED' , command = self.set_db1)
+        filemenu.add_command(label = 'EEWH', command = self.set_db2)
+        filemenu.add_separator()
+        filemenu.add_command(label="Exit" , command=self.master.quit)
+        menubar.add_cascade(label="System", menu=filemenu)
+
+        #self.dict2 = {['第一組','第二組','第三組']}
+        self.lb1 = tk.Label(self.master,text='依指標選擇')
+        self.lb1.place(x=0,y=0)
+        self.lb2 = tk.Label(self.master,text='依屬性選擇')
+        self.lb2.place(x=250,y=0)
+        self.lb3 = tk.Label(self.master,text='依變數值選擇')
+        self.lb3.place(x=500,y=0)
+        self.lb3 = tk.Label(self.master,text='儲存紀錄')
+        self.lb3.place(x=60,y=290)	
+		
+    def get_data(self, database_path = 'outputnew.db'):
+        con=sqlite3.connect(database_path)
         cur=con.cursor()
         cur.execute("SELECT name FROM sqlite_master Where Type In ('table')")
         tb_names=cur.fetchall()
         con.commit()		
 
         self.dict = {}
-        self.dict1={}
-        for i in range(0, len(tb_names)-1):
+        self.dict1= {}
+        for i in range(0, len(tb_names)):
             cur.execute("PRAGMA table_info(" + tb_names[i][0] + ")")
             field_names=cur.fetchall()
             con.commit()
@@ -45,24 +73,17 @@ class windowclass(tk.Frame):
                     brr.append(field_values[k][0])
                 self.dict1[field_names[j][1]]=brr
             self.dict[tb_names[i][0]]=arr
-        
-        con.close()
-
-        #self.dict2 = {['第一組','第二組','第三組']}
-
-        self.lb1 = tk.Label(master,text='依指標選擇')
-        self.lb1.place(x=0,y=0)
-        self.lb2 = tk.Label(master,text='依屬性選擇')
-        self.lb2.place(x=250,y=0)
-        self.lb3 = tk.Label(master,text='依變數值選擇')
-        self.lb3.place(x=500,y=0)
-        self.lb3 = tk.Label(master,text='儲存紀錄')
-        self.lb3.place(x=60,y=290)
-        
+        con.close()        
+		
         # Initialize comboboxes
-        self.combobox_a = ttk.Combobox(master, values=list(self.dict.keys()), state='readonly')
-        self.combobox_b = ttk.Combobox(master, values=self.dict['CO2減量'], state='readonly')
-        self.combobox_c = ttk.Combobox(master, values=self.dict1['構造形式'], state='readonly')
+        self.combobox_a = ttk.Combobox(self.master, values=list(self.dict.keys()), state='readonly')
+        if (database_path == 'outputnew.db'):
+            self.combobox_b = ttk.Combobox(self.master, values=self.dict['CO2減量'], state='readonly')
+            self.combobox_c = ttk.Combobox(self.master, values=self.dict1['構造形式'], state='readonly')
+        elif (database_path == 'leed.db'):
+            self.combobox_b = ttk.Combobox(self.master, values=self.dict['室內環境品質'], state='readonly')
+            self.combobox_c = ttk.Combobox(self.master, values=self.dict1['得分項目'], state='readonly')            
+		
         # Select 0 element
         self.combobox_a.current(0)
         self.combobox_b.current(0)
@@ -80,60 +101,61 @@ class windowclass(tk.Frame):
         self.combobox_b.place(x=250,y=25)
         self.combobox_c.place(x=500,y=25)
 
-        self.combobox_d = ttk.Combobox(master, values=['第一組','第二組','第三組','第四組','第五組','第六組','第七組','第八組','第九組','第十組'], state='readonly')
-        self.combobox_d.place(x=60,y=315)
-
-        def del_list_item():
-            sel_a = self.listb_a.curselection()
-            for index in sel_a[::-1]:
-                self.listb_a.delete(index)
-            sel_b = self.listb_b.curselection()
-            for index in sel_b[::-1]:
-                self.listb_b.delete(index)
-            sel_c = self.listb_c.curselection()
-            for index in sel_c[::-1]:
-                self.listb_c.delete(index)
-
-        def immediately():
-            sel_a = self.listb_a.curselection()
-            for index in sel_a[::+1]:
-                self.listb_a.insert(index)
-            sel_b = self.listb_b.curselection()
-            for index in sel_b[::+1]:
-                self.listb_b.insert(index)
-            sel_c = self.listb_c.curselection()
-            for index in sel_c[::+1]:
-                self.listb_c.insert(index)
-
-        self.lb4 = tk.Label(master,text='已選擇條件')
+        #self.combobox_d = ttk.Combobox(master, values=['第一組','第二組','第三組','第四組','第五組','第六組','第七組','第八組','第九組','第十組'], state='readonly')
+        #self.combobox_d.place(x=60,y=315)
+		
+		
+        self.lb4 = tk.Label(self.master,text='已選擇條件')
         self.lb4.place(x=0,y=60)
-        self.listb_a = tk.Listbox(master,width=30,selectmode = EXTENDED)
+        self.listb_a = tk.Listbox(self.master,width=30,selectmode = EXTENDED)
         self.items = self.listb_a.curselection()
         self.listb_a.place(x=0,y=80)
         
-        self.listb_b = tk.Listbox(master,width=30,selectmode = EXTENDED)
+        self.listb_b = tk.Listbox(self.master,width=30,selectmode = EXTENDED)
         self.listb_b.place(x=250,y=80)
-        self.listb_c = tk.Listbox(master,width=30,selectmode = EXTENDED)
+        self.listb_c = tk.Listbox(self.master,width=30,selectmode = EXTENDED)
         self.listb_c.place(x=500,y=80)
-        self.btn = tk.Button(master , text = "刪除" , command = del_list_item )
+        self.btn = tk.Button(self.master , text = "刪除" , command = self.del_list_item )
         self.btn.place(x=650,y=250)
         
-        self.btn1 = tk.Button(master , text = "查詢" , command =self.button_case)
+        self.btn1 = tk.Button(self.master , text = "查詢" , command =self.button_case)
         self.btn1.place(x=650,y=300)
 
-        self.btn1 = tk.Button(master , text = "儲存" , command =self.button_case)
+        self.btn1 = tk.Button(self.master , text = "儲存" , command =self.button_case)
         self.btn1.place(x=650,y=550)
 
-        self.recordbtn = tk.Button(master,text= '紀錄' , command =immediately)
+        self.recordbtn = tk.Button(self.master,text= '紀錄' , command = self.immediately)
         self.recordbtn.place(x=0,y=320)
         all_items =self.listb_a.get(0, tk.END)
-        self.recordlistb_a=tk.Listbox(master, width=30)
+        self.recordlistb_a=tk.Listbox(self.master, width=30)
         self.recordlistb_a.place(x=0,y=340)
-        self.recordlistb_b=tk.Listbox(master, width=30)
+        self.recordlistb_b=tk.Listbox(self.master, width=30)
         self.recordlistb_b.place(x=250,y=340)
-        self.recordlistb_c=tk.Listbox(master, width=30)
+        self.recordlistb_c=tk.Listbox(self.master, width=30)
         self.recordlistb_c.place(x=500,y=340)
 
+    def del_list_item(self):
+        sel_a = self.listb_a.curselection()
+        for index in sel_a[::-1]:
+            self.listb_a.delete(index)
+        sel_b = self.listb_b.curselection()
+        for index in sel_b[::-1]:
+            self.listb_b.delete(index)
+        sel_c = self.listb_c.curselection()
+        for index in sel_c[::-1]:
+            self.listb_c.delete(index)
+
+    def immediately(self):
+        sel_a = self.listb_a.curselection()
+        for index in sel_a[::+1]:
+            self.listb_a.insert(index)
+        sel_b = self.listb_b.curselection()
+        for index in sel_b[::+1]:
+            self.listb_b.insert(index)
+        sel_c = self.listb_c.curselection()
+        for index in sel_c[::+1]:
+            self.listb_c.insert(index)
+		
     def fun(self):
         print("changed 1-st combobox value to: " + self.combobox_a.get())
         if self.last_area != self.combobox_a.get():
@@ -225,8 +247,7 @@ class windowclass(tk.Frame):
             print('error')
             self.newWindow = tk.Toplevel(self.master)
             self.app = windowclass0(self.newWindow, self.app.tempList)
-
-    
+ 
 class windowclass0(tk.Frame):
     
     tempList_a = []
@@ -371,7 +392,6 @@ class windowclass0(tk.Frame):
     def windowclass13(self):
         self.newWindow = tk.Toplevel(self.master)
         self.app = windowclass13(self.newWindow)
-
 
 class windowclass13(tk.Frame):
     
@@ -846,7 +866,6 @@ class windowclass13(tk.Frame):
             self.tree.pack_forget() 
 
 """--------------------------------------照明節能--------------------------------------"""
-
 class windowclass1(windowclass,tk.Frame):
 
     tempList = []
@@ -914,10 +933,8 @@ class windowclass1(windowclass,tk.Frame):
                        
     def close_window(self):
             self.master.destroy()
-            
-
+       
 """--------------------------------------外殼節能--------------------------------------"""
-
 class windowclass2(tk.Frame):
     
     tempList = []
@@ -992,7 +1009,6 @@ class windowclass2(tk.Frame):
             self.master.destroy()
 
 """--------------------------------------空調節能--------------------------------------"""
-
 class windowclass3(tk.Frame):
     
     tempList = []
@@ -1091,7 +1107,6 @@ class windowclass3(tk.Frame):
             self.master.destroy()
 
 """--------------------------------------CO2減量--------------------------------------"""
-
 class windowclass4(tk.Frame):
     
     tempList = []
@@ -1173,7 +1188,6 @@ class windowclass4(tk.Frame):
             self.master.destroy()
 
 """--------------------------------------基地保水--------------------------------------"""
-
 class windowclass5(tk.Frame):
 
     tempList = []
@@ -1240,8 +1254,7 @@ class windowclass5(tk.Frame):
     def close_window6(self):
             self.master.destroy()
 
-"""--------------------------------------綠化設計--------------------------------------"""
-
+"""-------------------------------------綠化設計--------------------------------------"""
 class windowclass6(tk.Frame):
 
     tempList = []
@@ -1307,7 +1320,6 @@ class windowclass6(tk.Frame):
             self.master.destroy()
 
 """--------------------------------------室內環境--------------------------------------"""
-
 class windowclass7(tk.Frame):
     
     tempList = []
@@ -1380,7 +1392,6 @@ class windowclass7(tk.Frame):
             self.master.destroy()
             
 """--------------------------------------污水垃圾--------------------------------------"""
-
 class windowclass8(tk.Frame):
 
     tempList = []
@@ -1459,7 +1470,6 @@ class windowclass8(tk.Frame):
             self.master.destroy()
 
 """--------------------------------------廢棄物減量--------------------------------------"""
-
 class windowclass9(tk.Frame):
     
     tempList = []
@@ -1534,7 +1544,6 @@ class windowclass9(tk.Frame):
             self.master.destroy()
 
 """--------------------------------------廢棄物減量--------------------------------------"""
-
 class windowclass10(tk.Frame):
 
     
@@ -1700,31 +1709,36 @@ class windowclass12(tk.Frame):
     def close_window12(self):
             self.master.destroy()
 
+
+
 if __name__ == "__main__":
+    #menubar = Menu(root)
     
-    menubar = Menu(root)
+    #filemenu = Menu(menubar, tearoff=0)
+    #filemenu.add_command(label="LEED", command = set_db1)
+    #filemenu.add_command(label="LEED")
 
-    filemenu = Menu(menubar, tearoff=0)
-    filemenu.add_command(label="LEED")
+    #submenu = Menu(filemenu)
+    #"""
+    #submenu.add_command(label="照明節能")
+    #submenu.add_command(label="空調節能")
+    #submenu.add_command(label="外牆節能")
+    #"""
+    #filemenu.add_cascade(label='EEWH', underline=0 , command = set_db2)
+    #filemenu.add_cascade(label='EEWH', underline=0)
+    #filemenu.add_separator()
 
-
-    submenu = Menu(filemenu)
-    """
-    submenu.add_command(label="照明節能")
-    submenu.add_command(label="空調節能")
-    submenu.add_command(label="外牆節能")
-    """
-    filemenu.add_cascade(label='EEWH', underline=0)
-
-    filemenu.add_separator()
-
-    filemenu.add_command(label="Exit")
-    menubar.add_cascade(label="System", menu=filemenu)
-    editmenu = Menu(menubar, tearoff=0)
+    #filemenu.add_command(label="Exit")
+    #menubar.add_cascade(label="System", menu=filemenu)
+    #editmenu = Menu(menubar, tearoff=0)
 
 
-    editmenu.add_separator()
-    root.config(menu=menubar)
+    #editmenu.add_separator()
+    #root.config(menu=menubar)
 
-    app=windowclass(root)
-    app.mainloop()
+    XX = 'None!'
+    YY = 'None!'
+    ZZ = 'None!'
+    root = tk.Tk()	
+    app=windowclass(root)  #建立一個實體
+    app.mainloop()   #呈現它
