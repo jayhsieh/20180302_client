@@ -29,7 +29,7 @@ class windowclass(tk.Frame): #建立視窗實體
 		#建立一個選單實體
         menubar = Menu(self.master)
         self.master.config(menu = menubar)
-		
+        self.get_data()
 		#建立檔案物件
         filemenu = Menu(menubar, tearoff=0)
         #添加一個命令到選單選項，呼叫它來離開，而命令，它在client_exit事件執行
