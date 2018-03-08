@@ -9,6 +9,8 @@ else:
     import Tkinter as tk
 import sqlite3
 from tkinter import *
+import json
+import time
 
 class windowclass(tk.Frame): #建立視窗實體
     def __init__(self, master):         
@@ -47,7 +49,7 @@ class windowclass(tk.Frame): #建立視窗實體
         self.lb3 = tk.Label(self.master,text='依變數值選擇')
         self.lb3.place(x=500,y=0)
         self.lb3 = tk.Label(self.master,text='儲存紀錄')
-        self.lb3.place(x=60,y=290)	
+        self.lb3.place(x=60,y=280)	
 		
     def get_data(self, database_path = 'outputnew.db'):
         con=sqlite3.connect(database_path)
@@ -101,8 +103,10 @@ class windowclass(tk.Frame): #建立視窗實體
         self.combobox_b.place(x=250,y=25)
         self.combobox_c.place(x=500,y=25)
 
-        self.combobox_d = ttk.Combobox(self.master, values=['第一組','第二組','第三組','第四組','第五組','第六組','第七組','第八組','第九組','第十組'], state='readonly')
-        self.combobox_d.place(x=60,y=315)
+        self.combobox_d = ttk.Combobox(self.master, values=['1','2','3','4','5','6','7','8','9','10'], state='readonly')
+        # Add event to update variables on combobox d value change event
+        self.combobox_d.bind("<<ComboboxSelected>>", lambda f4: self.fun4())
+        self.combobox_d.place(x=60,y=310)
 		
 		
         self.lb4 = tk.Label(self.master,text='已選擇條件')
@@ -121,13 +125,9 @@ class windowclass(tk.Frame): #建立視窗實體
         self.btn1 = tk.Button(self.master , text = "查詢" , command =self.button_case)
         self.btn1.place(x=650,y=300)
 
-        self.btn1 = tk.Button(self.master , text = "儲存" , command =self.button_case)
-        self.btn1.place(x=650,y=550)
+        #self.btn1 = tk.Button(self.master , text = "儲存" , command =self.button_case)
+        #self.btn1.place(x=650,y=550)
 
-        self.recordbtn = tk.Button(self.master,text= '紀錄' , command = self.immediately)
-        self.recordbtn.place(x=0,y=320)
-
-        all_items =self.listb_a.get(0, tk.END)
         self.recordlistb_a=tk.Listbox(self.master, width=30)
         self.recordlistb_a.place(x=0,y=340)
         self.recordlistb_b=tk.Listbox(self.master, width=30)
@@ -135,28 +135,53 @@ class windowclass(tk.Frame): #建立視窗實體
         self.recordlistb_c=tk.Listbox(self.master, width=30)
         self.recordlistb_c.place(x=500,y=340)
 
-    def del_list_item(self):
-        #sel_a = self.listb_a.curselection()
-        #for index in sel_a[::-1]:
-            #self.listb_a.delete(index)
-        self.listb_a.delete(0, END)
-        sel_b = self.listb_b.curselection()
-        for index in sel_b[::-1]:
-            self.listb_b.delete(index)
-        sel_c = self.listb_c.curselection()
-        for index in sel_c[::-1]:
-            self.listb_c.delete(index)
+    def saving_selection(self):
+        all_items = self.recordlistb_a.get(0, tk.END)
+        sel_idx = self.recordlistb_a.curselection()
+        sel_list_a = [all_items[item] for item in range(0, len(all_items))]
+        snames_a = json.dumps(sel_list_a)
+        
+        all_items = self.recordlistb_b.get(0, tk.END)
+        sel_idx = self.recordlistb_b.curselection()
+        sel_list_b = [all_items[item] for item in range(0, len(all_items))]
+        snames_b = json.dumps(sel_list_b)
+        
+        all_items = self.recordlistb_b.get(0, tk.END)
+        sel_idx = self.recordlistb_b.curselection()
+        sel_list_c = [all_items[item] for item in range(0, len(all_items))]
+        snames_c = json.dumps(sel_list_c)
+        
+        con=sqlite3.connect('record.db')
+        cur=con.cursor()
+        
+        # 判斷筆數
+        cur.execute("SELECT count(*) FROM selection")
+        item_no=cur.fetchall()
+        item_no=item_no[0][0]+1
+        con.commit()
+        if item_no > 10:
+            cur.execute("DELETE FROM selection WHERE rowid = (SELECT rowid FROM selection order by dt ASC LIMIT 1)")
+            con.commit()            
+        
+        # 判斷流水號
+        cur.execute("SELECT no FROM selection order by dt DESC LIMIT 1")
+        item_no=cur.fetchall()
+        item_no=item_no[0][0] + 1
+        con.commit()
+        
+        # 塞入最新查詢
+        cur.execute("INSERT INTO selection VALUES (" + str(item_no) + ",'" + snames_a + "','" + snames_b + "','" + snames_c + "'," + str(time.time()) + ")")
+        con.commit()
 
-    def immediately(self):
-        sel_a = self.listb_a.curselection()
-        for index in sel_a[::+1]:
-            self.listb_a.insert(index)
-        sel_b = self.listb_b.curselection()
-        for index in sel_b[::+1]:
-            self.listb_b.insert(index)
-        sel_c = self.listb_c.curselection()
-        for index in sel_c[::+1]:
-            self.listb_c.insert(index)
+        con.close()
+        
+    def del_list_item(self):
+        self.listb_a.delete(0, END)
+        self.listb_b.delete(0, END)
+        self.listb_c.delete(0, END)
+        self.recordlistb_a.delete(0, END)
+        self.recordlistb_b.delete(0, END)
+        self.recordlistb_c.delete(0, END)
 		
     def fun(self):
         print("changed 1-st combobox value to: " + self.combobox_a.get())
@@ -189,8 +214,33 @@ class windowclass(tk.Frame): #建立視窗實體
         ZZ = self.combobox_c.get()
         self.listb_c.insert(END,ZZ)
         self.recordlistb_c.insert(END,ZZ)
+    
+    def fun4(self):
+        self.recordlistb_a.delete(0, END)
+        self.recordlistb_b.delete(0, END)
+        self.recordlistb_c.delete(0, END)
+    
+        group_no = int(self.combobox_d.get())
+        con=sqlite3.connect('record.db')
+        cur=con.cursor()
+        cur.execute("SELECT no,xx,yy,zz FROM selection order by dt desc")
+        item_no=cur.fetchall()
+        item_no=item_no[group_no-1]
+        con.commit()
+        con.close()
+        print(str(item_no[0]) + "," + item_no[1] + "," + item_no[2] + "," + item_no[3])
+        
+        for i in json.loads(item_no[1]):
+            self.recordlistb_a.insert(END,i)  
+
+        for i in json.loads(item_no[2]):
+            self.recordlistb_b.insert(END,i)
+
+        for i in json.loads(item_no[3]):
+            self.recordlistb_c.insert(END,i)            
 
     def button_case(self):
+        self.saving_selection()
         global XX
         XX = self.combobox_a.get()
         if XX=='照明節能':
