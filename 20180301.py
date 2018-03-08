@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-import sys
 import tkinter.messagebox as box
 from tkinter.filedialog import asksaveasfile
+import sys
 if sys.version_info[0] >= 3:
     import tkinter as tk
     import tkinter.ttk as ttk
@@ -101,8 +101,8 @@ class windowclass(tk.Frame): #建立視窗實體
         self.combobox_b.place(x=250,y=25)
         self.combobox_c.place(x=500,y=25)
 
-        #self.combobox_d = ttk.Combobox(master, values=['第一組','第二組','第三組','第四組','第五組','第六組','第七組','第八組','第九組','第十組'], state='readonly')
-        #self.combobox_d.place(x=60,y=315)
+        self.combobox_d = ttk.Combobox(self.master, values=['第一組','第二組','第三組','第四組','第五組','第六組','第七組','第八組','第九組','第十組'], state='readonly')
+        self.combobox_d.place(x=60,y=315)
 		
 		
         self.lb4 = tk.Label(self.master,text='已選擇條件')
@@ -126,6 +126,7 @@ class windowclass(tk.Frame): #建立視窗實體
 
         self.recordbtn = tk.Button(self.master,text= '紀錄' , command = self.immediately)
         self.recordbtn.place(x=0,y=320)
+
         all_items =self.listb_a.get(0, tk.END)
         self.recordlistb_a=tk.Listbox(self.master, width=30)
         self.recordlistb_a.place(x=0,y=340)
@@ -135,9 +136,10 @@ class windowclass(tk.Frame): #建立視窗實體
         self.recordlistb_c.place(x=500,y=340)
 
     def del_list_item(self):
-        sel_a = self.listb_a.curselection()
-        for index in sel_a[::-1]:
-            self.listb_a.delete(index)
+        #sel_a = self.listb_a.curselection()
+        #for index in sel_a[::-1]:
+            #self.listb_a.delete(index)
+        self.listb_a.delete(0, END)
         sel_b = self.listb_b.curselection()
         for index in sel_b[::-1]:
             self.listb_b.delete(index)
@@ -1709,33 +1711,7 @@ class windowclass12(tk.Frame):
     def close_window12(self):
             self.master.destroy()
 
-
-
 if __name__ == "__main__":
-    #menubar = Menu(root)
-    
-    #filemenu = Menu(menubar, tearoff=0)
-    #filemenu.add_command(label="LEED", command = set_db1)
-    #filemenu.add_command(label="LEED")
-
-    #submenu = Menu(filemenu)
-    #"""
-    #submenu.add_command(label="照明節能")
-    #submenu.add_command(label="空調節能")
-    #submenu.add_command(label="外牆節能")
-    #"""
-    #filemenu.add_cascade(label='EEWH', underline=0 , command = set_db2)
-    #filemenu.add_cascade(label='EEWH', underline=0)
-    #filemenu.add_separator()
-
-    #filemenu.add_command(label="Exit")
-    #menubar.add_cascade(label="System", menu=filemenu)
-    #editmenu = Menu(menubar, tearoff=0)
-
-
-    #editmenu.add_separator()
-    #root.config(menu=menubar)
-
     XX = 'None!'
     YY = 'None!'
     ZZ = 'None!'
