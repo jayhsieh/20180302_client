@@ -146,8 +146,8 @@ class windowclass(tk.Frame): #建立視窗實體
         sel_list_b = [all_items[item] for item in range(0, len(all_items))]
         snames_b = json.dumps(sel_list_b)
         
-        all_items = self.recordlistb_b.get(0, tk.END)
-        sel_idx = self.recordlistb_b.curselection()
+        all_items = self.recordlistb_c.get(0, tk.END)
+        sel_idx = self.recordlistb_c.curselection()
         sel_list_c = [all_items[item] for item in range(0, len(all_items))]
         snames_c = json.dumps(sel_list_c)
         
@@ -305,7 +305,7 @@ class windowclass0(tk.Frame):
     tempList_a = []
     tup_list=[]
     #bList=['外殼設計方案','空調設計方案','照明設計方案','CO2減量方案','廢棄物減量方案','室內環境設計方案','生物多樣性方案','綠化量設計方案','基地保水設計方案','水資源節省方案','污水垃圾改善方案']
-    def __init__(self , master, aList):
+    def __init__(self , master, aList, database_path = 'outputnew.db'):
         tk.Frame.__init__(self, master)
         master.title("SUMMARY")
         self.master.geometry("660x1080")
@@ -364,12 +364,13 @@ class windowclass0(tk.Frame):
             #print(item)
             #sql='select * from "成本" where "'+ XX +'" = ?', (item, )
             #ct='select count(*) from "成本"'
-            c.execute('select "編號","總成本_元","單位成本_元每坪","單位成本_元每平方公尺" from "成本" where "'+ XX +'" = ?', (item, ))
+            #c.execute('select "編號","總成本_元","單位成本_元每坪","單位成本_元每平方公尺" from "成本" where "'+ XX +'" = ?', (item, ))
+            c.execute('select "編號","總成本(元)","單位成本(元/坪","單位成本(元/平方公尺" from "成本" where "'+ XX +'" = ?', (item, ))
             
             rows=c.fetchall()
 
-            for r in c.execute('select "編號","總成本_元","單位成本_元每坪","單位成本_元每平方公尺" from "成本" where "'+ XX +'" = ?', (item, )):
-                
+            #for r in c.execute('select "編號","總成本_元","單位成本_元每坪","單位成本_元每平方公尺" from "成本" where "'+ XX +'" = ?', (item, )):
+            for r in c.execute('select "編號","總成本(元)","單位成本(元/坪","單位成本(元/平方公尺" from "成本" where "'+ XX +'" = ?', (item, )):    
                     #self.tempList_a=list(set(self.tempList_a))
                     #print(self.tempList_a)
                 #print(r)
@@ -450,7 +451,7 @@ class windowclass13(tk.Frame):
     tempList_a = []
     tup_list=[]
     #bList=['外殼設計方案','空調設計方案','照明設計方案','CO2減量方案','廢棄物減量方案','室內環境設計方案','生物多樣性方案','綠化量設計方案','基地保水設計方案','水資源節省方案','污水垃圾改善方案']
-    def __init__(self , master):
+    def __init__(self , master , database_path = 'outputnew.db'):
         tk.Frame.__init__(self, master)
         master.title("方案內容")
         self.master.geometry("700x700")
@@ -921,7 +922,7 @@ class windowclass13(tk.Frame):
 class windowclass1(windowclass,tk.Frame):
 
     tempList = []
-    def __init__(self , master):
+    def __init__(self, master, database_path = 'outputnew.db'):
         self.master = master
         self.frame = tk.Frame(master)
         master.title("結果")
@@ -990,7 +991,7 @@ class windowclass1(windowclass,tk.Frame):
 class windowclass2(tk.Frame):
     
     tempList = []
-    def __init__(self , master):
+    def __init__(self , master, database_path = 'outputnew.db'):
         tk.Frame.__init__(self, master)
         master.title("結果")
         self.master.geometry("1000x800")
@@ -1064,7 +1065,7 @@ class windowclass2(tk.Frame):
 class windowclass3(tk.Frame):
     
     tempList = []
-    def __init__(self , master):
+    def __init__(self , master, database_path = 'outputnew.db'):
         tk.Frame.__init__(self, master)
         master.title("結果")
         self.master.geometry("1000x800")
@@ -1162,7 +1163,7 @@ class windowclass3(tk.Frame):
 class windowclass4(tk.Frame):
     
     tempList = []
-    def __init__(self , master):
+    def __init__(self , master, database_path = 'outputnew.db'):
         tk.Frame.__init__(self, master)
         master.title("結果")
         self.master.geometry("1000x800")
@@ -1243,7 +1244,7 @@ class windowclass4(tk.Frame):
 class windowclass5(tk.Frame):
 
     tempList = []
-    def __init__(self , master):
+    def __init__(self , master, database_path = 'outputnew.db'):
         tk.Frame.__init__(self, master)
         master.title("結果")
         self.master.geometry("1000x800")
@@ -1310,7 +1311,7 @@ class windowclass5(tk.Frame):
 class windowclass6(tk.Frame):
 
     tempList = []
-    def __init__(self , master):
+    def __init__(self , master, database_path = 'outputnew.db'):
         tk.Frame.__init__(self, master)
         master.title("結果")
         self.master.geometry("1000x800")
@@ -1375,7 +1376,7 @@ class windowclass6(tk.Frame):
 class windowclass7(tk.Frame):
     
     tempList = []
-    def __init__(self , master):
+    def __init__(self , master, database_path = 'outputnew.db'):
         tk.Frame.__init__(self, master)
         master.title("結果")
         self.master.geometry("1000x800")
@@ -1447,7 +1448,7 @@ class windowclass7(tk.Frame):
 class windowclass8(tk.Frame):
 
     tempList = []
-    def __init__(self , master):
+    def __init__(self , master, database_path = 'outputnew.db'):
         tk.Frame.__init__(self, master)
         master.title("結果")
         self.master.geometry("1000x800")
@@ -1525,7 +1526,7 @@ class windowclass8(tk.Frame):
 class windowclass9(tk.Frame):
     
     tempList = []
-    def __init__(self , master):
+    def __init__(self , master, database_path = 'outputnew.db'):
         tk.Frame.__init__(self, master)
         master.title("結果")
         self.master.geometry("1000x800")
@@ -1600,7 +1601,7 @@ class windowclass10(tk.Frame):
 
     
     tempList = []
-    def __init__(self , master):
+    def __init__(self , master, database_path = 'outputnew.db'):
         
         tk.Frame.__init__(self, master)
         master.title("結果")
@@ -1695,7 +1696,7 @@ class windowclass12(tk.Frame):
     
     tempList = []
     tup_list=[]
-    def __init__(self , master):
+    def __init__(self , master, database_path = 'outputnew.db'):
         tk.Frame.__init__(self, master)
         master.title("外殼節能")
         self.master.geometry("1000x800")
