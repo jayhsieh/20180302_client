@@ -934,7 +934,7 @@ class windowclass1(windowclass,tk.Frame):
 
         #滚动条
         self.scrollBar = Scrollbar(self.frame1)
-        self.scrollBar.pack(side=RIGHT, fill=Y,)
+        self.scrollBar.pack(side=RIGHT, fill=Y)
         self.scrollBar1 = Scrollbar(self.frame1,orient=HORIZONTAL)
         self.scrollBar1.pack(side=BOTTOM, fill=X)
 
@@ -978,9 +978,7 @@ class windowclass1(windowclass,tk.Frame):
         for tup in rows:
             self.tempList.append(tup[0])
             #print(list(set(self.tempList)))
-            
-
-
+ 
         for row in rows:
             self.tree.insert("","end",values=row)
                        
